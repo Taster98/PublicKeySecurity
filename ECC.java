@@ -35,9 +35,9 @@ public class ECC {
     }
     //Controlla che y sia residuo quadratico
     public boolean residuoQuadratico(BigInteger x, BigInteger y){
-        List<ECPoint> pnts = generaPunti();
+        List<ECPoint> pnts = getCurve();
         for(ECPoint px : pnts){
-           if(x.equals(px.getX()) && y.equals(px.getY())){
+           if(y.equals(px.getY()) && x.equals(px.getX())){
                return true;
            }
         }
@@ -141,7 +141,7 @@ public class ECC {
     public Pair<ECPoint,ECPoint> ECEncrypt(ECPoint Pm, ECPoint B, ECPoint pubKey){
         Random c = new Random();
 
-        int rIn = c.nextInt((((getP().subtract(BigInteger.valueOf(5))).intValue()) - 2) + 1 ) + 2;
+        int rIn = c.nextInt((((getP().subtract(BigInteger.valueOf(5))).intValue()) - 600) + 1 ) + 600;
 
         //Devo generare V = rB
         BigInteger r = BigInteger.valueOf(rIn);

@@ -44,10 +44,10 @@ public class RSA {
         return d;
     }
     public BigInteger Encrypt(BigInteger msg, BigInteger n, BigInteger e){
-        return (msg.pow(e.intValue())).mod(n);
+        return (msg.modPow(e,n));
     }
 
     public BigInteger Decrypt(BigInteger crt, BigInteger n, BigInteger d){
-        return (crt.pow(d.intValue())).mod(n);
+        return (crt.modPow(d,n));
     }
 }
