@@ -10,40 +10,41 @@ import java.math.BigInteger;
 
 public class TestMain {
     private static long startTime = System.nanoTime();
-    private static ECC curva = new ECC(BigInteger.valueOf(-1),BigInteger.valueOf(1),BigInteger.valueOf(10427));
-    private static RSA cifrario = new RSA(BigInteger.valueOf(137),BigInteger.valueOf(79));
+    //private static ECC curva = new ECC(BigInteger.valueOf(-1),BigInteger.valueOf(1),BigInteger.valueOf(10427));
+    private static ECC curva = new ECC(BigInteger.valueOf(-1),BigInteger.valueOf(1),BigInteger.valueOf(31647773));
+    //private static ECC curva = new ECC(BigInteger.valueOf(-1),BigInteger.valueOf(1),BigInteger.valueOf(8977763));
+    //private static RSA cifrario = new RSA(BigInteger.valueOf(137),BigInteger.valueOf(79));
+    //private static RSA cifrario = new RSA(BigInteger.valueOf(3319),BigInteger.valueOf(2939));
+    private static RSA cifrario = new RSA(BigInteger.valueOf(4127),BigInteger.valueOf(4099));
     private static BigInteger crittoRSA;
     private static Pair<ECPoint,ECPoint> crittoECC;
     private static ECPoint Bb;
     private static ECPoint Pd;
-    private static BigInteger H;
     public static void testECC(){
-        System.out.println("TEST CIFRATURA CON CURVE ELLITTICHE PRIME: (chiave a ~10 bit)\n");
-        System.out.println("Il mittente Mitt prova a cifrare il messaggio intero '17' con la curva ellittica prima E(-1,1)mod(10427)\n\n");
-        //System.out.println("Genero tutti i punti della curva:");
-        /*for(ECPoint a : curva.getCurve()){
-            System.out.println("("+ a.getX()+", "+a.getY()+")");
-        }*/
-
-        System.out.println("Il numero totale dei punti della curva è: "+curva.getCurve().size()+"\n\n");
+        System.out.println("TEST CIFRATURA CON CURVE ELLITTICHE PRIME: (chiave a 24 bit)\n");
+        System.out.println("Il mittente Mitt prova a cifrare il messaggio intero '17' con la curva ellittica prima E(-1,1)mod(777777493)\n\n");
 
         int m = 17;
         int h = (int) Math.floor((curva.getP().divide(BigInteger.valueOf(m).add(BigInteger.valueOf(1)))).intValue());
-        H = BigInteger.valueOf(h);
+        BigInteger H = BigInteger.valueOf(h);
+        curva.setH(H);
         ECPoint msg = null;
         try {
-            msg = curva.koblitz(BigInteger.valueOf(m),h);
+            msg = curva.koblitz(BigInteger.valueOf(m));
         } catch (NoPointException e) {
             e.printStackTrace();
         }
         System.out.println("Trasformo il messaggio "+m+" nel punto nella curva ("+msg.getX()+", "+msg.getY()+") con l'algoritmo di Koblitz\n\n");
-        ECPoint B = new ECPoint(curva,BigInteger.valueOf(3188),BigInteger.valueOf(10374));
+        //ECPoint B = new ECPoint(curva,BigInteger.valueOf(3188),BigInteger.valueOf(10374));
+        //ECPoint B = new ECPoint(curva,BigInteger.valueOf(167),BigInteger.valueOf(1122988));
+        ECPoint B = new ECPoint(curva,BigInteger.valueOf(167),BigInteger.valueOf(17943642));
         Bb = B;
         System.out.println("Viene ora generato un punto della curva a caso sulla quale i due interlocutori si mettono d'accordo\n per avviare il protocollo per lo scambio dei messaggi di El Gamal, ad esempio B = ("+B.getX()+","+B.getY()+")\n\n");
         System.out.println("Il destinatario si sceglie una chiave privata (in questo caso di ~10 bit), con la quale poi creerà la chiave pubblica\n\n");
-        //Genero una chiave di 23 bit
+        //Genero una chiave di 24 bit
         //BigInteger prvKey = BigInteger.valueOf(5779567);
-        BigInteger prvKey = BigInteger.valueOf(7817);
+        //BigInteger prvKey = BigInteger.valueOf(7817);
+        BigInteger prvKey = BigInteger.valueOf(9754541);
 
         System.out.println("La lunghezza della chiave è: ~"+prvKey.bitLength()+" bit");
         ECPoint pubKey = null;
@@ -60,7 +61,7 @@ public class TestMain {
         System.out.println("Il destinatario Dest riceve quindi la coppia di punti: V = ("+crt.getKey().getX()+","+crt.getKey().getY()+"), W = ("+crt.getValue().getX()+","+crt.getValue().getY()+")\n\n");
         ECPoint dcrt = curva.ECDecrypt(crt,prvKey);
         System.out.println("Il destinatario con l'opportuna funzione di decifrazione decifra con la sua chiave privata il messaggio, che è salvato nel punto: Pm = ("+dcrt.getX()+","+dcrt.getY()+")\n\n");
-        BigInteger messaggioFinale = curva.PointToMessage(dcrt,BigInteger.valueOf(h));
+        BigInteger messaggioFinale = curva.PointToMessage(dcrt);
         System.out.println("Il messaggio originale era dunque: "+messaggioFinale+"\n");
     }
 
@@ -148,7 +149,7 @@ public class TestMain {
         } catch (PointToInfiniteException e) {
             e.printStackTrace();
         }
-        BigInteger msg = curva.PointToMessage(Pm,H);
+        BigInteger msg = curva.PointToMessage(Pm);
         System.out.println("Ho trovato il punto Pm = ("+Pm.getX()+","+Pm.getY()+"). Ora provo ad estrarre il messaggio dal punto della curva:");
 
         long endTime = System.nanoTime();
@@ -178,8 +179,10 @@ public class TestMain {
         String s1 = String.format("%.3g",0.001*t2/1000000);
         String s2 = String.format("%.3g",0.001*t1/1000000);
         System.out.println("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
-        System.out.println("---------------------------------------------------\n|     Fattorizzazione     |   Logaritmo Discreto   |\n---------------------------------------------------\n|     "+s1+" secondi       |    "+s2+" secondi    |\n---------------------------------------------------\n");
-        int n = (int) ((int) t1/t2);
-        System.out.println("Da ciò si evince che la fattorizzazione richieda circa "+n+" volte meno tempo rispetto alla risoluzione del logaritmo discreto su curve ellittiche a parità di chiave\n\nFINE");
+        System.out.println("---------------------------------------------------\n|     Fattorizzazione     |   Logaritmo Discreto   |\n---------------------------------------------------\n|      "+s1+" secondi       |    "+s2+" secondi         |\n---------------------------------------------------\n");
+        double n = t1/t2;
+        String nn = String.format("%.3g",n);
+        System.out.println("Da ciò si evince che il logaritmo discreto su curve ellittiche sia "+nn+" volte più difficile da calcolare rispetto alla fattorizzazione a parità di chiave\n\nFINE");
+
     }
 }
