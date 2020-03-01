@@ -29,5 +29,4 @@ public class ECPoint {
     public BigInteger getY() {
         return y;
     }
-
 }

@@ -7,42 +7,47 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SecurityTest {
-    //Chiavi a 10 bit:
+    //Messaggi cifrati per 10,16,20,24,25 bit:
     private static int m10 = 7;
     private static int m16 = 13;
     private static int m20 = 17;
     private static int m24 = 29;
     private static int m25 = 251;
     //RSA:
+    //p=37, q=19 10-bit
     private static RSA cfrRSA10 = new RSA(BigInteger.valueOf(37),BigInteger.valueOf(19));
+    //p=241 q=157 16-bit
     private static RSA cfrRSA16 = new RSA(BigInteger.valueOf(241),BigInteger.valueOf(157));
+    //p=397 q=1597 20-bit
     private static RSA cfrRSA20 = new RSA(BigInteger.valueOf(397),BigInteger.valueOf(1597));
+    //p=3947 q=2557 24-bit
     private static RSA cfrRSA24 = new RSA(BigInteger.valueOf(3947),BigInteger.valueOf(2557));
+    //p=3001 q=5743 25-bit
     private static RSA cfrRSA25 = new RSA(BigInteger.valueOf(3001),BigInteger.valueOf(5743));
 
 
     //ECC:
-    //10 bit
+    //10 bit E_823(-1,1)
     private static ECC cfrECC10 = new ECC(BigInteger.valueOf(-1),BigInteger.valueOf(1),BigInteger.valueOf(823));
     private static ECPoint B10 = new ECPoint(cfrECC10.getA(),cfrECC10.getB(),cfrECC10.getP(),BigInteger.valueOf(19),BigInteger.valueOf(293));
     private static ECPoint Pd10;
     private static BigInteger prvKey10 = BigInteger.valueOf(899);
-    //16 bit
+    //16 bit E_46133(-1,1)
     private static ECC cfrECC16 = new ECC(BigInteger.valueOf(-1),BigInteger.valueOf(1),BigInteger.valueOf(46133));
     private static ECPoint B16 = new ECPoint(cfrECC16.getA(),cfrECC16.getB(),cfrECC16.getP(),BigInteger.valueOf(113),BigInteger.valueOf(35151));
     private static ECPoint Pd16;
     private static BigInteger prvKey16 = BigInteger.valueOf(41899);
-    //20 bit
+    //20 bit E_761291(-1,1)
     private static ECC cfrECC20 = new ECC(BigInteger.valueOf(-1),BigInteger.valueOf(1),BigInteger.valueOf(761291));
     private static ECPoint B20 = new ECPoint(cfrECC20.getA(),cfrECC20.getB(),cfrECC20.getP(),BigInteger.valueOf(167),BigInteger.valueOf(539846));
     private static ECPoint Pd20;
     private static BigInteger prvKey20 = BigInteger.valueOf(641899);
-    //24 bit
+    //24 bit E_8812313(-1,1)
     private static ECC cfrECC24 = new ECC(BigInteger.valueOf(-1),BigInteger.valueOf(1),BigInteger.valueOf(8812313));
     private static ECPoint B24 = new ECPoint(cfrECC24.getA(),cfrECC10.getB(),cfrECC10.getP(),BigInteger.valueOf(773),BigInteger.valueOf(3443266));
     private static ECPoint Pd24;
     private static BigInteger prvKey24 = BigInteger.valueOf(9341899);
-    //25 bit
+    //25 bit E_28123133(-1,1)
     private static ECC cfrECC25 = new ECC(BigInteger.valueOf(-1),BigInteger.valueOf(1),BigInteger.valueOf(28123133));
     private static ECPoint B25 = new ECPoint(cfrECC25.getA(),cfrECC25.getB(),cfrECC25.getP(),BigInteger.valueOf(2903),BigInteger.valueOf(14901307));
     private static ECPoint Pd25;
@@ -123,7 +128,7 @@ public class SecurityTest {
                 break;
             }
         }
-        System.out.println("La fattorizzazione è avvenuta con successo e i due numeri primi sono rispettivamente: p = "+p+", q = "+q+".\n\n");
+        System.out.println("La fattorizzazione e' avvenuta con successo e i due numeri primi sono rispettivamente: p = "+p+", q = "+q+".\n\n");
         BigInteger phi = (p.subtract(BigInteger.valueOf(1))).multiply(q.subtract(BigInteger.valueOf(1)));
         BigInteger d = cfr.getE().modInverse(phi);
         System.out.println("Da questi posso dedurre che phi = "+phi+" e dunque posso ricavarmi la chiave privata d = "+d +" dalla quale posso risalire al messaggio m = "+crt.modPow(d,cfr.getN())+"\n\n");
@@ -154,7 +159,7 @@ public class SecurityTest {
         }
         BigInteger msg = cfr.PointToMessage(Pm);
         System.out.println("Ho trovato il punto Pm = ("+Pm.getX()+","+Pm.getY()+"). Ora provo ad estrarre il messaggio dal punto della curva:");
-        System.out.println("Il logaritmo discreto è stato svolto con successo, il numero r = "+r+" e il messaggio m = "+msg +".");
+        System.out.println("Il logaritmo discreto e' stato svolto con successo, il numero r = "+r+" e il messaggio m = "+msg +".");
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -546,11 +551,9 @@ public class SecurityTest {
         return primi;
     }
     private static boolean isPrime(BigInteger number) {
-        for (int i = 2; i*i < number.intValue(); i++) {
-            if (number.intValue() % i == 0) {
+        for (int i = 2; i*i < number.intValue(); i++)
+            if (number.intValue() % i == 0)
                 return false;
-            }
-        }
         return true;
     }
 }
